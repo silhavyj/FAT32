@@ -9,7 +9,18 @@ int main() {
     assert(sizeof(FAT32::DirEntry_t) <= FAT32::CLUSTER_SIZE);
 
     IFS *fs = FAT32::getInstance();
-    fs->ls();
+    fs->mkdir("doc");
+    fs->mkdir("tmp");
     fs->pwd();
+    fs->ls();
+    fs->cd("doc");
+    fs->mkdir("test");
+    fs->pwd();
+    fs->ls();
+    fs->cd("././././../doc");
+    fs->pwd();
+    fs->cd("/");
+    fs->pwd();
+    fs->ls();
     return 0;
 }

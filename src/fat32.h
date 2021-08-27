@@ -4,7 +4,6 @@
 #include <climits>
 #include <cstdint>
 #include <array>
-#include <list>
 
 #include "fs.h"
 #include "diskdriver.h"
@@ -39,6 +38,8 @@ public:
         uint32_t parentStartCluster;
         uint32_t size;
         bool directory;
+        bool operator==(const DirEntry_t other) const;
+        bool operator!=(const DirEntry_t other) const;
     } __attribute__((packed));
 
     struct DirHeader_t {
@@ -51,7 +52,10 @@ public:
     struct Dir_t {
         DirHeader_t header;
         DirEntry_t *entries;
+        ~Dir_t();
     } __attribute__((packed));
+
+    DirEntry_t NULL_DIR_ENTRY;
 
     static constexpr uint32_t ENTRIES_IN_ONE_CLUSTER = CLUSTER_SIZE / sizeof(DirEntry_t);
     static constexpr uint32_t ENTRIES_IN_CLUSTER_AFTER_DIR_HEADER = (CLUSTER_SIZE - sizeof(DirHeader_t)) / sizeof(DirEntry_t);
@@ -59,13 +63,14 @@ public:
 private:
     IDiskDriver *disk;
     std::array<uint32_t, CLUSTER_COUNT> fat;
+    Dir_t *rootDir;
     Dir_t *workingDir;
-    std::list<std::string> currPath;
     
     static FAT32 *instance;
 
 private:
     FAT32();
+    ~FAT32();
     FAT32(FAT32 &) = delete;
     void operator=(FAT32 &) = delete;
 
@@ -83,9 +88,9 @@ private:
     Dir_t *createEmptyDir(std::string name, uint32_t parentStartCluster);
     inline uint32_t clusterAddr(uint32_t index);
     void addEntryIntoDir(Dir_t *parentDir, DirEntry_t *entry);
-    bool nameTaken(std::string name, Dir_t *dir);
-    DirEntry_t *createEntry(Dir_t *dir);
-    DirEntry_t *getEntry(std::string path);
+    DirEntry_t getEntry(std::string name, Dir_t *dir);
+    DirEntry_t getEntry(std::string path);
+    DirEntry_t createEntry(Dir_t *dir);
 
     void printDir(Dir_t *dir);
     void printDirEntry(DirEntry_t *entry);

@@ -7,6 +7,8 @@
 
 #include "debugger.h"
 
+static std::vector<std::string> split(const std::string& s, char c);
+
 FAT32 *FAT32::instance = nullptr;
 
 FAT32 *FAT32::getInstance() {
@@ -15,24 +17,50 @@ FAT32 *FAT32::getInstance() {
     return instance;
 }
 
-FAT32::FAT32() : disk(new Disk), workingDir(nullptr) {
+FAT32::FAT32() : disk(new Disk), workingDir(nullptr), rootDir(nullptr) {
     if (disk->diskExists(DISK_FILE_NAME) == false)
         initialize();
     disk->open(DISK_FILE_NAME);
     load();
 }
 
+FAT32::~FAT32() {
+    if (workingDir != nullptr)
+        delete workingDir;
+    if (rootDir != nullptr)
+        delete rootDir;
+    disk->close();
+    delete disk;
+    delete instance;
+}
+
+FAT32::Dir_t::~Dir_t() {
+    if (entries != nullptr) {
+        delete[] entries;
+        entries = nullptr;
+    }
+}
+
+bool FAT32::DirEntry_t::operator==(const DirEntry_t other) const {
+    return memcmp(reinterpret_cast<const void *>(this), reinterpret_cast<const void *>(&other), sizeof(DirEntry_t)) == 0;
+}
+
+bool FAT32::DirEntry_t::operator!=(const DirEntry_t other) const {
+    return !(*this == other);
+}
+
 void FAT32::initialize() {
     disk->create(DISK_FILE_NAME, DISK_SIZE);
     disk->open(DISK_FILE_NAME);
     fat.fill(FREE_CLUSTER);
-    workingDir = createEmptyDir("/", ROOT_DIR_CLUSTER_INDEX);
+    rootDir = createEmptyDir("/", ROOT_DIR_CLUSTER_INDEX);
     save();
     disk->close();
+    delete rootDir;
 }
 
 void FAT32::save() {
-    saveDir(workingDir);
+    saveDir(rootDir);
     saveFat(); // fat table must be stored after all changes has been done
 }
 
@@ -48,8 +76,8 @@ inline void FAT32::loadFat() {
 
 void FAT32::load() {
     loadFat();
-    workingDir = loadDir(ROOT_DIR_CLUSTER_INDEX);
-    currPath.push_back(workingDir->header.name);
+    rootDir = loadDir(ROOT_DIR_CLUSTER_INDEX);
+    workingDir = rootDir;
 }
 
 void FAT32::saveDir(Dir_t *dir) {
@@ -239,32 +267,32 @@ FAT32::Dir_t *FAT32::createEmptyDir(std::string name, uint32_t parentStartCluste
     return dir;
 }
 
-FAT32::DirEntry_t *FAT32::createEntry(Dir_t *dir) {
+FAT32::DirEntry_t FAT32::createEntry(Dir_t *dir) {
     assert(dir != nullptr && "dir is null");
-    DirEntry_t *entry = new DirEntry_t;
-    strcpy(entry->name, dir->header.name);
-    entry->startCluster = dir->header.startCluster;
-    entry->parentStartCluster = dir->header.parentStartCluster;
-    entry->size = sizeof(Dir_t);
-    entry->directory = true;
+    DirEntry_t entry;
+    strcpy(entry.name, dir->header.name);
+    entry.startCluster = dir->header.startCluster;
+    entry.parentStartCluster = dir->header.parentStartCluster;
+    entry.size = sizeof(Dir_t);
+    entry.directory = true;
     return entry;
 }
 
-bool FAT32::nameTaken(std::string name, Dir_t *dir) {
+FAT32::DirEntry_t FAT32::getEntry(std::string name, Dir_t *dir) {
     assert(dir != nullptr && "dir is null");
     if (dir->header.entryCount == 0)
-        return false;
+        return NULL_DIR_ENTRY;
     for (uint32_t i = 0; i < dir->header.entryCount; i++) {
         if (strcmp(dir->entries[i].name, name.c_str()) == 0)
-            return true;
+            return dir->entries[i];
     }
-    return false;
+    return NULL_DIR_ENTRY;
 }
 
 void FAT32::addEntryIntoDir(Dir_t *dir, DirEntry_t *entry) {
     assert(dir != nullptr && "dir is null");
     assert(entry != nullptr && "entry is null");
-    assert(!nameTaken(entry->name, dir) && "names is already taken");
+    assert(getEntry(entry->name, dir) == NULL_DIR_ENTRY && "names is already taken");
     
     if (dir->header.entryCount == 0) {
         dir->header.entryCount++;
@@ -323,14 +351,66 @@ void FAT32::printFAT() {
     }
 }
 
-FAT32::DirEntry_t *FAT32::getEntry(std::string path) {
-    // TODO
+static std::vector<std::string> split(const std::string& s, char c) {
+    std::vector<std::string> tokens;
+    std::stringstream ss(s);
+    std::string token;
+
+    while (getline(ss, token, c))
+        if (token != "")
+            tokens.emplace_back(token);
+    return move(tokens);
+}
+
+FAT32::DirEntry_t FAT32::getEntry(std::string path) {
+    assert(path.length() > 0 && "invalid path");
+    if (path == ".")
+        return createEntry(workingDir);
+    if (path == "..") {
+        std::unique_ptr<Dir_t> parentDir(loadDir(workingDir->header.parentStartCluster));
+        return createEntry(parentDir.get());
+    }
+    
+    DirEntry_t entry;
+    Dir_t *currDir;
+    Dir_t *tmpDir;
+    Dir_t *parentDir;
+    bool absolute = path[0] == '/';
+
+    if (absolute) {
+        currDir = loadDir(ROOT_DIR_CLUSTER_INDEX);
+    } else {
+        currDir = loadDir(workingDir->header.startCluster);
+    }
+    entry = createEntry(currDir);
+
+    std::vector<std::string> tokens = split(path, '/');
+    for (uint32_t i = 0; i < tokens.size(); i++) {
+        if (tokens[i] == ".") {
+            continue;
+        } else if (tokens[i] == "..") {
+            parentDir = loadDir(currDir->header.parentStartCluster);
+            entry = createEntry(parentDir);
+            delete parentDir;
+        } else {
+            entry = getEntry(tokens[i], currDir);
+        }
+        if (entry == NULL_DIR_ENTRY || entry.directory == false) {
+            delete currDir;
+            return NULL_DIR_ENTRY;
+        }
+        tmpDir = currDir;
+        currDir = loadDir(entry.startCluster);
+        delete tmpDir;
+    }
+    delete currDir;
+    return entry;
 }
 
 void FAT32::mkdir(std::string name) {
-    std::unique_ptr<Dir_t> dir(createEmptyDir(name, 0));
-    std::unique_ptr<DirEntry_t> entry(createEntry(dir.get()));
-    addEntryIntoDir(workingDir, entry.get());
+    std::unique_ptr<Dir_t> dir(createEmptyDir(name, workingDir->header.startCluster));
+    DirEntry_t entry = createEntry(dir.get());
+    addEntryIntoDir(workingDir, &entry);
     saveDir(dir.get());
 }
 
@@ -339,30 +419,30 @@ void FAT32::ls() {
 }
 
 void FAT32::pwd() {
-    std::stringstream ss;
-    for (auto &dir : currPath) {
-        ss << dir;
-        if (dir != "/") // dont print // (root)
-            ss << "/";
+    std::string path = "";
+    Dir_t *prevDir;
+    Dir_t *dir = loadDir(workingDir->header.startCluster);
+
+    while (dir->header.startCluster != ROOT_DIR_CLUSTER_INDEX) {
+        path = "/" + std::string(dir->header.name) + path;
+        prevDir = dir;
+        dir = loadDir(dir->header.parentStartCluster);
+        delete prevDir;
     }
-    std::string out = ss.str();
-    if (out.length() > 1)
-        out.pop_back(); // pop out the last '/'
-    std::cout << out << "\n";
+    if (path == "")
+        path = "/";
+    std::cout << path << '\n';
+    delete dir;
 }
 
 void FAT32::cd(std::string path) {
     assert(path.length() > 0 && "invalid path");
-    
-    if (path == "..") {
-        Dir_t *prevDir = workingDir;
-        workingDir = loadDir(workingDir->header.parentStartCluster);
-        delete prevDir;
+    DirEntry_t entry = getEntry(path);
+    assert(entry != NULL_DIR_ENTRY && "entry is null");
+    assert(entry.directory == true && "entry is not a directory");
 
-        if (currPath.size() > 1)
-            currPath.pop_back();
-        return;
-    }
-
-    bool absolute = path[0] == '/';
+    // change the current working directory and delete the old one
+    Dir_t *prevWorkingDir = workingDir;
+    workingDir = loadDir(entry.startCluster);
+    delete prevWorkingDir;
 }
