@@ -22,5 +22,7 @@ int main() {
     fs->cd("/");
     fs->pwd();
     fs->ls();
+    fs->rmdir("/doc/testA");
+
     return 0;
 }

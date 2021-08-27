@@ -407,6 +407,34 @@ FAT32::DirEntry_t FAT32::getEntry(std::string path) {
     return entry;
 }
 
+void FAT32::removeEntryFromDir(Dir_t*dir, DirEntry_t *entry) {
+    assert(dir != nullptr && "dir is null");
+    assert(entry != nullptr && "entry is null");
+    
+    // find the possition of the entry to delete
+    uint32_t p = 0;
+    for (; p < dir->header.entryCount; p++)
+        if (strcmp(dir->entries[p].name, entry->name) == 0)
+            break;
+
+    uint32_t index = 0;
+    uint32_t n = dir->header.entryCount;
+    DirEntry_t *prevEntries = dir->entries;
+    DirEntry_t *entries = new DirEntry_t[n-1];
+
+    // copy all entries except the one to be deleted
+    for (uint32_t i = 0; i < n; i++)
+        if (i != p)
+            entries[index++] = dir->entries[i];
+    
+    // update the parent dir
+    dir->header.entryCount--;
+    dir->entries = entries;
+    delete[] prevEntries;
+
+    saveDir(dir);
+}
+
 void FAT32::mkdir(std::string name) {
     std::unique_ptr<Dir_t> dir(createEmptyDir(name, workingDir->header.startCluster));
     DirEntry_t entry = createEntry(dir.get());
@@ -436,7 +464,6 @@ void FAT32::pwd() {
 }
 
 void FAT32::cd(std::string path) {
-    assert(path.length() > 0 && "invalid path");
     DirEntry_t entry = getEntry(path);
     assert(entry != NULL_DIR_ENTRY && "entry is null");
     assert(entry.directory == true && "entry is not a directory");
@@ -445,4 +472,31 @@ void FAT32::cd(std::string path) {
     Dir_t *prevWorkingDir = workingDir;
     workingDir = loadDir(entry.startCluster);
     delete prevWorkingDir;
+}
+
+void FAT32::rmdir(std::string path) {
+    DirEntry_t entry = getEntry(path);
+    assert(entry != NULL_DIR_ENTRY && "entry is null");
+    assert(entry.directory == true && "entry is not a directory");
+    
+    std::unique_ptr<Dir_t> dir(loadDir(entry.startCluster));
+    assert(dir->header.entryCount == 0 && "dir is not empty");
+    std::unique_ptr<Dir_t> parentDir(loadDir(entry.parentStartCluster));
+    removeEntryFromDir(parentDir.get(), &entry);
+}
+
+void FAT32::in(std::string path) {
+    // TODO
+}
+
+void FAT32::out(std::string path) {
+    // TODO
+}
+
+void FAT32::cat(std::string path) {
+    // TODO
+}
+
+void FAT32::rm(std::string path) {
+    // TODO
 }

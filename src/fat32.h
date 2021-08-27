@@ -87,7 +87,8 @@ private:
     void freeAllOccupiedClusters(uint32_t startCluster);
     Dir_t *createEmptyDir(std::string name, uint32_t parentStartCluster);
     inline uint32_t clusterAddr(uint32_t index);
-    void addEntryIntoDir(Dir_t *parentDir, DirEntry_t *entry);
+    void addEntryIntoDir(Dir_t *dir, DirEntry_t *entry);
+    void removeEntryFromDir(Dir_t*dir, DirEntry_t *entry);
     DirEntry_t getEntry(std::string name, Dir_t *dir);
     DirEntry_t getEntry(std::string path);
     DirEntry_t createEntry(Dir_t *dir);
@@ -103,6 +104,11 @@ public:
     void ls() override;
     void pwd() override;
     void cd(std::string path) override;
+    void rmdir(std::string path) override;
+    void in(std::string path) override;
+    void out(std::string path) override;
+    void cat(std::string path) override;
+    void rm(std::string path) override;
 };
 
 #endif
