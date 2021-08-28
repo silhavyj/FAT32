@@ -17,7 +17,7 @@ public:
     static constexpr uint32_t MAX_NAME_LEN = 12;
     static constexpr const char *DISK_FILE_NAME  = "disk.dat";
 
-    static constexpr uint32_t DISK_SIZE    = KB(1);
+    static constexpr uint32_t DISK_SIZE    = MB(1);
     static constexpr uint32_t CLUSTER_SIZE = 40;
     static constexpr uint8_t ADDR_SIZE = sizeof(uint32_t);
 
@@ -91,7 +91,10 @@ private:
     void removeEntryFromDir(Dir_t*dir, DirEntry_t *entry);
     DirEntry_t getEntry(std::string name, Dir_t *dir);
     DirEntry_t getEntry(std::string path);
+    DirEntry_t createFileEntry(Dir_t *dir, const char *name, uint32_t size);
     DirEntry_t createEntry(Dir_t *dir);
+    inline uint32_t getFileSize(FILE *file) const;
+    std::string getFileName(std::string path) const;
 
     void printDir(Dir_t *dir);
     void printDirEntry(DirEntry_t *entry);

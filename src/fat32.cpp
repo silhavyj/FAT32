@@ -395,10 +395,12 @@ FAT32::DirEntry_t FAT32::getEntry(std::string path) {
         } else {
             entry = getEntry(tokens[i], currDir);
         }
-        if (entry == NULL_DIR_ENTRY || entry.directory == false) {
+        if (entry == NULL_DIR_ENTRY || (i < (tokens.size() - 1) && entry.directory == false)) {
             delete currDir;
             return NULL_DIR_ENTRY;
         }
+        if (i == tokens.size() - 1 && entry.directory == false)
+            break;
         tmpDir = currDir;
         currDir = loadDir(entry.startCluster);
         delete tmpDir;
@@ -485,18 +487,146 @@ void FAT32::rmdir(std::string path) {
     removeEntryFromDir(parentDir.get(), &entry);
 }
 
+inline uint32_t FAT32::getFileSize(FILE *file) const {
+    fseek(file, 0, SEEK_END);
+    uint32_t fileSize = ftell(file);
+    fseek(file, 0, SEEK_SET);
+    return fileSize;
+}
+
+std::string FAT32::getFileName(std::string path) const {
+    if (path.back() == '/')
+        path.pop_back();
+
+    size_t pos = path.find_first_of('/');
+    if (pos == std::string::npos)
+        return path;
+    return path.substr(pos + 1);
+}
+
+FAT32::DirEntry_t FAT32::createFileEntry(Dir_t *dir, const char *name, uint32_t size) {
+    assert(existsNumberOfFreeClusters(1) && "not enough free clusters");
+    DirEntry_t entry;
+    entry.startCluster = getFreeCluster();
+    entry.parentStartCluster = dir->header.startCluster;
+    entry.directory = false;
+    entry.size = size;
+    strcpy(entry.name, name);
+    return entry;
+}
+
 void FAT32::in(std::string path) {
-    // TODO
+    FILE *file = fopen(path.c_str(), "rb+");
+    assert(file != nullptr && "file was not found");
+
+    uint32_t size = getFileSize(file);
+    uint32_t clustersNeeded = ceil(static_cast<double>(size) / CLUSTER_SIZE);
+    uint32_t lastClusterSize = size % CLUSTER_SIZE;
+    std::string name = getFileName(path);
+
+    assert(getEntry(name, workingDir) == NULL_DIR_ENTRY && "name is already taken");
+    // +1 is because of the entry itself, the rest is taken up by the content
+    assert(existsNumberOfFreeClusters(1 + clustersNeeded) && "not enough free clusters");
+
+    DirEntry_t entry = createFileEntry(workingDir, name.c_str(), size);
+    addEntryIntoDir(workingDir, &entry);
+
+    uint32_t prevCluster;
+    uint32_t currCluster = entry.startCluster;
+    uint32_t fileOffset = 0;
+    std::unique_ptr<char> buffer(new char[CLUSTER_SIZE]);
+
+    // the last cluster needs to be handeled separately 
+    for (uint32_t i = 0; i < clustersNeeded - 1; i++) {
+        // read one junk of data from the input file
+        fseek(file, fileOffset, SEEK_SET);
+        fread(buffer.get(), CLUSTER_SIZE, 1, file);
+        fileOffset += CLUSTER_SIZE;
+
+        // store the junk into the current cluster
+        disk->setAddr(clusterAddr(currCluster));
+        disk->write(buffer.get(), CLUSTER_COUNT);
+
+        // move on to the next cluster
+        prevCluster = currCluster;
+        currCluster = getFreeCluster();
+        fat[prevCluster] = currCluster;
+    }
+    // the very last cluster
+    fseek(file, fileOffset, SEEK_SET);
+    fread(buffer.get(), lastClusterSize, 1, file);
+    disk->setAddr(clusterAddr(currCluster));
+    disk->write(buffer.get(), lastClusterSize);
+
+    // the eof cluster
+    prevCluster = currCluster;
+    currCluster = getFreeCluster();
+    fat[prevCluster] = currCluster;
+    fat[currCluster] = EOF_CLUSTER;
+
+    fclose(file);
+    saveFat();
 }
 
 void FAT32::out(std::string path) {
-    // TODO
+    DirEntry_t entry = getEntry(path);
+
+    assert(entry != NULL_DIR_ENTRY && "file not found");
+    assert(entry.directory == false && "target is not a file");
+
+    std::string name = getFileName(path);
+    FILE *file = fopen(name.c_str(), "wb");
+    assert(file != nullptr && "could not open the output file");
+
+    std::unique_ptr<char> buffer(new char[CLUSTER_SIZE]);
+    std::uint32_t currCluster = entry.startCluster;
+    std::uint32_t clusterCount = ceil(static_cast<double>(entry.size) / CLUSTER_SIZE);
+    uint32_t lastClusterSize = entry.size % CLUSTER_SIZE;
+
+    for (uint32_t i = 0; i < clusterCount - 1; i++) {
+        disk->setAddr(clusterAddr(currCluster));
+        disk->read(buffer.get(), CLUSTER_SIZE);
+        fwrite(buffer.get(), CLUSTER_SIZE, 1, file);
+        currCluster = fat[currCluster];
+    }
+
+    disk->setAddr(clusterAddr(currCluster));
+    disk->read(buffer.get(), lastClusterSize);
+    buffer.get()[lastClusterSize] = '\0';
+    fwrite(buffer.get(), lastClusterSize, 1, file);
+
+    currCluster = fat[currCluster];
+    assert(fat[currCluster] == EOF_CLUSTER && "file was not read properly");
+    fclose(file);
 }
 
 void FAT32::cat(std::string path) {
-    // TODO
+    DirEntry_t entry = getEntry(path);
+
+    assert(entry != NULL_DIR_ENTRY && "file not found");
+    assert(entry.directory == false && "target is not a file");
+
+    std::unique_ptr<char> buffer(new char[CLUSTER_SIZE]);
+    std::uint32_t currCluster = entry.startCluster;
+    std::uint32_t clusterCount = ceil(static_cast<double>(entry.size) / CLUSTER_SIZE);
+    uint32_t lastClusterSize = entry.size % CLUSTER_SIZE;
+
+    for (uint32_t i = 0; i < clusterCount - 1; i++) {
+        disk->setAddr(clusterAddr(currCluster));
+        disk->read(buffer.get(), CLUSTER_SIZE);
+        std::cout << buffer.get();
+        currCluster = fat[currCluster];
+    }
+    disk->setAddr(clusterAddr(currCluster));
+    disk->read(buffer.get(), lastClusterSize);
+    buffer.get()[lastClusterSize] = '\0';
+    std::cout << buffer.get();
+
+    currCluster = fat[currCluster];
+    assert(fat[currCluster] == EOF_CLUSTER && "file was not read properly");
 }
 
 void FAT32::rm(std::string path) {
     // TODO
+    (void)path;
 }

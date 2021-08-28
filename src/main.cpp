@@ -22,7 +22,13 @@ int main() {
     fs->cd("/");
     fs->pwd();
     fs->ls();
-    fs->rmdir("/doc/testA");
+    fs->rmdir("/doc/test");
+    fs->in("data/wtf.gif");
+    fs->ls();
+    fs->in("data/test.txt");
+    fs->ls();
+    fs->cat("test.txt");
+    fs->out("wtf.gif");
 
     return 0;
 }
