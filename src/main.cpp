@@ -29,6 +29,9 @@ int main() {
     fs->ls();
     fs->cat("test.txt");
     fs->out("wtf.gif");
+    fs->rm("wtf.gif");
+    std::cout << "\n";
+    fs->ls();
 
     return 0;
 }

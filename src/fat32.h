@@ -112,6 +112,8 @@ public:
     void out(std::string path) override;
     void cat(std::string path) override;
     void rm(std::string path) override;
+    void cp(std::string des, std::string src) override;
+    void mv(std::string des, std::string src) override;
 };
 
 #endif

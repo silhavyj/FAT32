@@ -14,6 +14,8 @@ public:
     virtual void out(std::string path) = 0;
     virtual void cat(std::string path) = 0;
     virtual void rm(std::string path) = 0;
+    virtual void cp(std::string des, std::string src) = 0;
+    virtual void mv(std::string des, std::string src) = 0;
 };
 
 #endif

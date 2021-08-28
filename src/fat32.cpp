@@ -445,6 +445,9 @@ void FAT32::mkdir(std::string name) {
 }
 
 void FAT32::ls() {
+    // there might have been some changes in terms of the entries
+    // so it's better to keep the working directory up to date
+    workingDir = loadDir(workingDir->header.startCluster);
     printDir(workingDir);
 }
 
@@ -602,7 +605,6 @@ void FAT32::out(std::string path) {
 
 void FAT32::cat(std::string path) {
     DirEntry_t entry = getEntry(path);
-
     assert(entry != NULL_DIR_ENTRY && "file not found");
     assert(entry.directory == false && "target is not a file");
 
@@ -627,6 +629,27 @@ void FAT32::cat(std::string path) {
 }
 
 void FAT32::rm(std::string path) {
+    DirEntry_t entry = getEntry(path);
+    assert(entry != NULL_DIR_ENTRY && "file not found");
+    assert(entry.directory == false && "target is not a file");
+    
+    std::unique_ptr<Dir_t> dir(loadDir(entry.parentStartCluster));
+    removeEntryFromDir(dir.get(), &entry);
+    freeAllOccupiedClusters(entry.startCluster);
+
+    // also we must not forget to delete the very first cluster
+    fat[entry.startCluster] = FREE_CLUSTER;
+    saveFat();
+}
+
+void FAT32::cp(std::string des, std::string src) {
     // TODO
-    (void)path;
+    (void)des;
+    (void)src;
+}
+
+void FAT32::mv(std::string des, std::string src) {
+    // TODO
+    (void)des;
+    (void)src;
 }
