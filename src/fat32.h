@@ -63,19 +63,16 @@ public:
 private:
     IDiskDriver *disk;
     std::array<uint32_t, CLUSTER_COUNT> fat;
-    Dir_t *rootDir;
-    Dir_t *workingDir;
+    uint32_t workingDirStartCluster;
     
     static FAT32 *instance;
 
 private:
     FAT32();
-    ~FAT32();
     FAT32(FAT32 &) = delete;
     void operator=(FAT32 &) = delete;
 
     void initialize();
-    void save();
     void load();
     inline void saveFat();
     inline void loadFat();

@@ -17,21 +17,11 @@ FAT32 *FAT32::getInstance() {
     return instance;
 }
 
-FAT32::FAT32() : disk(new Disk), workingDir(nullptr), rootDir(nullptr) {
+FAT32::FAT32() : disk(new Disk), workingDirStartCluster(ROOT_DIR_CLUSTER_INDEX) {
     if (disk->diskExists(DISK_FILE_NAME) == false)
         initialize();
     disk->open(DISK_FILE_NAME);
     load();
-}
-
-FAT32::~FAT32() {
-    if (workingDir != nullptr)
-        delete workingDir;
-    if (rootDir != nullptr)
-        delete rootDir;
-    disk->close();
-    delete disk;
-    delete instance;
 }
 
 FAT32::Dir_t::~Dir_t() {
@@ -53,15 +43,10 @@ void FAT32::initialize() {
     disk->create(DISK_FILE_NAME, DISK_SIZE);
     disk->open(DISK_FILE_NAME);
     fat.fill(FREE_CLUSTER);
-    rootDir = createEmptyDir("/", ROOT_DIR_CLUSTER_INDEX);
-    save();
+    std::unique_ptr<Dir_t> rootDir(createEmptyDir("/", ROOT_DIR_CLUSTER_INDEX));
+    saveDir(rootDir.get());
+    saveFat();
     disk->close();
-    delete rootDir;
-}
-
-void FAT32::save() {
-    saveDir(rootDir);
-    saveFat(); // fat table must be stored after all changes has been done
 }
 
 inline void FAT32::saveFat() {
@@ -76,8 +61,7 @@ inline void FAT32::loadFat() {
 
 void FAT32::load() {
     loadFat();
-    rootDir = loadDir(ROOT_DIR_CLUSTER_INDEX);
-    workingDir = rootDir;
+    workingDirStartCluster = ROOT_DIR_CLUSTER_INDEX;
 }
 
 void FAT32::saveDir(Dir_t *dir) {
@@ -364,8 +348,10 @@ static std::vector<std::string> split(const std::string& s, char c) {
 
 FAT32::DirEntry_t FAT32::getEntry(std::string path) {
     assert(path.length() > 0 && "invalid path");
-    if (path == ".")
-        return createEntry(workingDir);
+    std::unique_ptr<Dir_t> workingDir(loadDir(workingDirStartCluster));
+    if (path == ".") {
+        return createEntry(workingDir.get());
+    }
     if (path == "..") {
         std::unique_ptr<Dir_t> parentDir(loadDir(workingDir->header.parentStartCluster));
         return createEntry(parentDir.get());
@@ -438,20 +424,20 @@ void FAT32::removeEntryFromDir(Dir_t*dir, DirEntry_t *entry) {
 }
 
 void FAT32::mkdir(std::string name) {
+    std::unique_ptr<Dir_t> workingDir(loadDir(workingDirStartCluster));
     std::unique_ptr<Dir_t> dir(createEmptyDir(name, workingDir->header.startCluster));
     DirEntry_t entry = createEntry(dir.get());
-    addEntryIntoDir(workingDir, &entry);
+    addEntryIntoDir(workingDir.get(), &entry);
     saveDir(dir.get());
 }
 
 void FAT32::ls() {
-    // there might have been some changes in terms of the entries
-    // so it's better to keep the working directory up to date
-    workingDir = loadDir(workingDir->header.startCluster);
-    printDir(workingDir);
+    std::unique_ptr<Dir_t> workingDir(loadDir(workingDirStartCluster));
+    printDir(workingDir.get());
 }
 
 void FAT32::pwd() {
+    std::unique_ptr<Dir_t> workingDir(loadDir(workingDirStartCluster));
     std::string path = "";
     Dir_t *prevDir;
     Dir_t *dir = loadDir(workingDir->header.startCluster);
@@ -472,11 +458,7 @@ void FAT32::cd(std::string path) {
     DirEntry_t entry = getEntry(path);
     assert(entry != NULL_DIR_ENTRY && "entry is null");
     assert(entry.directory == true && "entry is not a directory");
-
-    // change the current working directory and delete the old one
-    Dir_t *prevWorkingDir = workingDir;
-    workingDir = loadDir(entry.startCluster);
-    delete prevWorkingDir;
+    workingDirStartCluster = entry.startCluster;
 }
 
 void FAT32::rmdir(std::string path) {
@@ -526,13 +508,14 @@ void FAT32::in(std::string path) {
     uint32_t clustersNeeded = ceil(static_cast<double>(size) / CLUSTER_SIZE);
     uint32_t lastClusterSize = size % CLUSTER_SIZE;
     std::string name = getFileName(path);
+    std::unique_ptr<Dir_t> workingDir(loadDir(workingDirStartCluster));
 
-    assert(getEntry(name, workingDir) == NULL_DIR_ENTRY && "name is already taken");
+    assert(getEntry(name, workingDir.get()) == NULL_DIR_ENTRY && "name is already taken");
     // +1 is because of the entry itself, the rest is taken up by the content
     assert(existsNumberOfFreeClusters(1 + clustersNeeded) && "not enough free clusters");
 
-    DirEntry_t entry = createFileEntry(workingDir, name.c_str(), size);
-    addEntryIntoDir(workingDir, &entry);
+    DirEntry_t entry = createFileEntry(workingDir.get(), name.c_str(), size);
+    addEntryIntoDir(workingDir.get(), &entry);
 
     uint32_t prevCluster;
     uint32_t currCluster = entry.startCluster;
