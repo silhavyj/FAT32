@@ -114,7 +114,9 @@ void Shell::run() {
                 std::cout << "missing directory\n";
             } else {
                 fs->tree(args[1]);
-            } 
+            }
+        } else if (args[0] == "info") {
+            fs->info();
         } else {
             std::cout << "invalid command\n";
         }

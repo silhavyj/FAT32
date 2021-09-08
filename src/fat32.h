@@ -114,6 +114,7 @@ public:
     void mv(std::string des, std::string src) override;
     void tree(std::string path) override;
     std::string getPWD() override;
+    void info() override;
 };
 
 #endif

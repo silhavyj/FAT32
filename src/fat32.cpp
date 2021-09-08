@@ -752,3 +752,19 @@ void FAT32::printTree(Dir_t *dir, uint32_t depth) {
         }
     }
 }
+
+void FAT32::info() {
+    uint32_t freeClusters = 0;
+    for (uint32_t i = 0; i < CLUSTER_COUNT; i++)
+        freeClusters += fat[i] == FREE_CLUSTER;
+
+    size_t totalSize = CLUSTER_COUNT * CLUSTER_SIZE;
+    size_t freeSize = freeClusters * CLUSTER_SIZE;
+
+    std::cout << "total clusters   : " << CLUSTER_COUNT << '\n';
+    std::cout << "free clusters    : " << freeClusters << '\n';
+    std::cout << "cluster size [B] : " << CLUSTER_SIZE << '\n';
+    std::cout << "total size   [B] : " << totalSize << '\n';
+    std::cout << "free size    [B] : " << freeSize << '\n';
+    std::cout << "free size    [%] : " << ((freeSize * 100.0) / totalSize) << '\n';
+}
