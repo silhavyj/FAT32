@@ -17,8 +17,8 @@ public:
     static constexpr uint32_t MAX_NAME_LEN = 12;
     static constexpr const char *DISK_FILE_NAME  = "disk.dat";
 
-    static constexpr uint32_t DISK_SIZE    = MB(1);
-    static constexpr uint32_t CLUSTER_SIZE = 40;
+    static constexpr uint32_t DISK_SIZE    = MB(50);
+    static constexpr uint32_t CLUSTER_SIZE = 128;
     static constexpr uint8_t ADDR_SIZE = sizeof(uint32_t);
 
     static constexpr uint32_t CLUSTER_COUNT = DISK_SIZE / (ADDR_SIZE + CLUSTER_SIZE);
@@ -96,12 +96,13 @@ private:
     void printDir(Dir_t *dir);
     void printDirEntry(DirEntry_t *entry);
     void printFAT();
+    void printTree(Dir_t *dir, uint32_t depth);
 
 public:
     static FAT32 *getInstance();
 
     void mkdir(std::string name) override;
-    void ls() override;
+    void ls(std::string path) override;
     void pwd() override;
     void cd(std::string path) override;
     void rmdir(std::string path) override;
@@ -111,6 +112,8 @@ public:
     void rm(std::string path) override;
     void cp(std::string des, std::string src) override;
     void mv(std::string des, std::string src) override;
+    void tree(std::string path) override;
+    std::string getPWD() override;
 };
 
 #endif

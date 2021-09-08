@@ -129,6 +129,7 @@ void FAT32::saveDir(Dir_t *dir) {
     currCluster = getFreeCluster();
     fat[prevCluster] = currCluster;
     fat[currCluster] = EOF_CLUSTER;
+    saveFat();
 }
 
 void  FAT32::saveDirFirstCluster(Dir_t *dir, uint32_t entryCount) {
@@ -278,6 +279,8 @@ void FAT32::addEntryIntoDir(Dir_t *dir, DirEntry_t *entry) {
     assert(entry != nullptr && "entry is null");
     assert(getEntry(entry->name, dir) == NULL_DIR_ENTRY && "names is already taken");
     
+    entry->parentStartCluster = dir->header.startCluster;
+
     if (dir->header.entryCount == 0) {
         dir->header.entryCount++;
         dir->entries = new DirEntry_t[1];
@@ -431,12 +434,23 @@ void FAT32::mkdir(std::string name) {
     saveDir(dir.get());
 }
 
-void FAT32::ls() {
-    std::unique_ptr<Dir_t> workingDir(loadDir(workingDirStartCluster));
-    printDir(workingDir.get());
+void FAT32::ls(std::string path) {
+    DirEntry_t entry = getEntry(path);
+    assert(entry != NULL_DIR_ENTRY && "entry is NULL");
+
+    if (entry.directory) {
+        std::unique_ptr<Dir_t> workingDir(loadDir(entry.startCluster));
+        printDir(workingDir.get());
+    } else {
+        printDirEntry(&entry);
+    }
 }
 
 void FAT32::pwd() {
+    std::cout << getPWD() << "\n";
+}
+
+std::string FAT32::getPWD() {
     std::unique_ptr<Dir_t> workingDir(loadDir(workingDirStartCluster));
     std::string path = "";
     Dir_t *prevDir;
@@ -450,8 +464,8 @@ void FAT32::pwd() {
     }
     if (path == "")
         path = "/";
-    std::cout << path << '\n';
     delete dir;
+    return path;
 }
 
 void FAT32::cd(std::string path) {
@@ -483,7 +497,7 @@ std::string FAT32::getFileName(std::string path) const {
     if (path.back() == '/')
         path.pop_back();
 
-    size_t pos = path.find_first_of('/');
+    size_t pos = path.find_last_of('/');
     if (pos == std::string::npos)
         return path;
     return path.substr(pos + 1);
@@ -617,6 +631,7 @@ void FAT32::rm(std::string path) {
     assert(entry.directory == false && "target is not a file");
     
     std::unique_ptr<Dir_t> dir(loadDir(entry.parentStartCluster));
+
     removeEntryFromDir(dir.get(), &entry);
     freeAllOccupiedClusters(entry.startCluster);
 
@@ -632,7 +647,108 @@ void FAT32::cp(std::string des, std::string src) {
 }
 
 void FAT32::mv(std::string des, std::string src) {
-    // TODO
-    (void)des;
-    (void)src;
+    /* 
+       POSSIBLE OPTIONS:
+       (1) /data       <- mv into a folder (under the same name) 
+       (1) /data/      <- mv into a folder (under the same name) 
+       (2) /data/file  <- mv into a folder (under a new name) 
+       (3) /data/file1 <- mv into a folder (overwrite an existing file) 
+    */
+
+    // get the source file
+    std::string fileName;
+    DirEntry_t file = getEntry(src);
+    assert(file != NULL_DIR_ENTRY && "file not found");
+    assert(file.directory == false && "cannot move a directory");
+
+    Dir_t *dir;
+    DirEntry_t destination = getEntry(des);
+
+    // remove the file from its original parent dir
+    dir = loadDir(file.parentStartCluster);
+    removeEntryFromDir(dir, &file);
+    delete dir;
+
+    // (2)
+    if (destination == NULL_DIR_ENTRY) {
+        fileName = getFileName(des);
+        std::string parentDirPath;
+
+        size_t pos = des.find_last_of('/');
+        if (pos == std::string::npos)
+            parentDirPath = des;
+        else parentDirPath = des.substr(0,  + 1);
+
+        DirEntry_t entry = getEntry(parentDirPath);
+
+        strcpy(file.name, fileName.c_str());  
+        dir = loadDir(entry.startCluster);
+        addEntryIntoDir(dir, &file);
+        delete dir;
+    } else if (destination.directory == true) {
+        // (1)
+        fileName = getFileName(src);
+        dir = loadDir(destination.startCluster);
+        DirEntry_t entry = getEntry(fileName, dir);
+
+        // if there's a file with the same name it will be overwritten
+        if (entry != NULL_DIR_ENTRY) {
+            removeEntryFromDir(dir, &entry);
+            freeAllOccupiedClusters(entry.startCluster);
+
+            // also we must not forget to delete the very first cluster
+            fat[entry.startCluster] = FREE_CLUSTER;
+            saveFat();
+
+            // reload the directory after the file has been deleted
+            delete dir;
+            dir = loadDir(destination.startCluster);  
+        }
+        // move the file into the new dir
+        addEntryIntoDir(dir, &file);
+        delete dir;
+    } else {
+        // (3)  
+        rm(des);
+        dir = loadDir(destination.parentStartCluster);
+        strcpy(file.name, destination.name);
+        addEntryIntoDir(dir, &file);
+        delete dir;
+    }
+}
+
+void FAT32::tree(std::string path) {
+    DirEntry_t entry = getEntry(path);
+    assert(entry.directory == true && "path must be a directory");
+    std::unique_ptr<Dir_t> dir(loadDir(entry.startCluster));
+    printTree(dir.get(), 0);
+}
+
+void FAT32::printTree(Dir_t *dir, uint32_t depth) {
+    /* 
+        [+] /
+        \__ [-] x.txt
+            [+] doc
+            \__ [-] a.pdf
+            \__ [+] tmp 
+    */
+    if (depth == 0) {
+        for (int j = 0; j < depth * 4; j++)
+            std::cout << " ";
+        std::cout << "[+] " << dir->header.name << "\n";
+    }
+
+    for (uint32_t i = 0; i < dir->header.entryCount; i++) {
+        for (int j = 0; j < depth * 4; j++)
+            std::cout << " ";
+        std::cout << "\\__ ";
+
+        printDirEntry(&dir->entries[i]);
+
+        if (dir->entries[i].directory == true) {
+            Dir_t *nestedDir = loadDir(dir->entries[i].startCluster);
+            printTree(nestedDir, depth + 1);
+            delete nestedDir;
+        }
+    }
 }

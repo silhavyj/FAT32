@@ -1,12 +1,12 @@
 #ifndef _FS_H_
 #define _FS_H_
 
-#include <cstring>
+#include <string>
 
 class IFS {
 public:
     virtual void mkdir(std::string name) = 0;
-    virtual void ls() = 0;
+    virtual void ls(std::string path) = 0;
     virtual void pwd() = 0;
     virtual void cd(std::string path) = 0;
     virtual void rmdir(std::string path) = 0;
@@ -16,6 +16,8 @@ public:
     virtual void rm(std::string path) = 0;
     virtual void cp(std::string des, std::string src) = 0;
     virtual void mv(std::string des, std::string src) = 0;
+    virtual void tree(std::string path) = 0;
+    virtual std::string getPWD() = 0;
 };
 
 #endif
