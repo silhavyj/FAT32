@@ -18,6 +18,7 @@ public:
     virtual void mv(std::string des, std::string src) = 0;
     virtual std::string getPWD() = 0;
     virtual void info() = 0;
+    virtual void tree(std::string path) = 0;
 };
 
 #endif

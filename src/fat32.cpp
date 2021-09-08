@@ -764,3 +764,36 @@ void FAT32::info() {
     std::cout << "free size    [B] : " << freeSize << '\n';
     std::cout << "free size    [%] : " << ((freeSize * 100.0) / totalSize) << '\n';
 }
+
+void FAT32::tree(std::string path) {
+    DirEntry_t entry = getEntry(path);
+    assert(entry != NULL_DIR_ENTRY && "dir is NULL");
+    assert(entry.directory && "cannot print tree of a dir");
+    std::unique_ptr<Dir_t> dir(loadDir(entry.startCluster));
+    printTree(dir.get(), 0);
+}
+
+void FAT32::printTree(Dir_t *dir, uint32_t space) {
+    /*
+        [+] /
+          |_ [-] document.pdf
+          |_ [+] img
+               |_ [+] a
+    */
+    if (space == 0)
+        std::cout << "[+] " << dir->header.name << "\n";
+
+    for (uint32_t i = 0; i < dir->header.entryCount; i++) {
+        for (int j = 0; j < space + 2; j++)
+            std::cout << " ";
+        std::cout << "|_ ";
+        if (dir->entries[i].directory == false) {
+            std::cout << "[-] " << dir->entries[i].name << "\n";
+        } else {
+            std::cout << "[+] " << dir->entries[i].name << "\n";
+            Dir_t *nestedDir = loadDir(dir->entries[i].startCluster);
+            printTree(nestedDir, space + 5);
+            delete nestedDir;
+        }
+    }
+}

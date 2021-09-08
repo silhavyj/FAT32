@@ -147,6 +147,12 @@ void Shell::execute(std::vector<std::string> &args) {
         } 
     } else if (args[0] == "info") {
         fs->info();
+    } else if (args[0] == "tree") {
+        if (args.size() == 1) {
+            fs->tree(".");
+        } else {
+            fs->tree(args[1]);
+        }
     } else {
         std::cout << "invalid command\n";
     }

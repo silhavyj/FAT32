@@ -97,7 +97,7 @@ private:
     void printDir(Dir_t *dir);
     void printDirEntry(DirEntry_t *entry);
     void printFAT();
-    void printTree(Dir_t *dir, uint32_t depth);
+    void printTree(Dir_t *dir, uint32_t space);
 
 public:
     static FAT32 *getInstance();
@@ -115,6 +115,7 @@ public:
     void mv(std::string des, std::string src) override;
     std::string getPWD() override;
     void info() override;
+    void tree(std::string path) override;
 };
 
 #endif
