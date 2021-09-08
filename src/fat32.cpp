@@ -443,7 +443,7 @@ void FAT32::mkdir(std::string name) {
     if (pos == std::string::npos) {
         dirStartCluster = workingDirStartCluster;
     } else {
-        std::string parDir = name.substr(0, pos);
+        std::string parDir = name.substr(0, pos + 1);
         entry = getEntry(parDir);
         assert(entry != NULL_DIR_ENTRY && "target parent dir is NULL");
         assert(entry.directory == true && "cannot insert into a file");
@@ -705,12 +705,12 @@ void FAT32::mv(std::string des, std::string src) {
         // (2)
         fileName = getFileName(des);
         lastSlashPos = des.find_last_of('/');
+        DirEntry_t dirEntry;
         if (lastSlashPos == std::string::npos) {
-            parentDirPath = des;
+            dirEntry = getEntry(getPWD());
         } else {
-            parentDirPath = des.substr(0, lastSlashPos + 1);
+            dirEntry = getEntry(des.substr(0, lastSlashPos + 1));
         }
-        DirEntry_t dirEntry = getEntry(parentDirPath);
         assert(dirEntry.directory == true && "error when loading target dir");
         
         strcpy(file.name, fileName.c_str());

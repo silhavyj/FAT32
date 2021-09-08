@@ -8,3 +8,10 @@ mv /doc/vid2.wbm /tmp/output/vid2_out.wbm
 ls /tmp/output
 pwd
 out ../tmp/output/vid2_out.wbm
+mkdir /tmp2
+cd /tmp2
+in data/vid1.wbm
+mv vid1.wbm vid3.xx
+mv vid3.xx vid1.wbm
+mv vid1.wbm vid1_out.wbm
+out vid1_out.wbm
