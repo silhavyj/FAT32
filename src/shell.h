@@ -18,6 +18,8 @@ private:
 private:
     std::vector<std::string> split(std::string str, char separator);
     void printPrompt();
+    void execute(std::vector<std::string> &args);
+    void loadCommands(std::string path);
 
 public:
     static Shell *getInstance();

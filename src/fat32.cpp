@@ -1,6 +1,7 @@
 #include <cmath>
 #include <memory>
 #include <sstream>
+#include <iomanip>
 
 #include "fat32.h"
 #include "disk.h"
@@ -305,18 +306,25 @@ void FAT32::addEntryIntoDir(Dir_t *dir, DirEntry_t *entry) {
 
 void FAT32::printDir(Dir_t *dir) {
     assert(dir != nullptr && "dir is null");
+    if (dir->header.entryCount == 0)
+        return;
+    std::cout << "type"   << std::setw(LS_SPACING)
+              << "size"   << std::setw(LS_SPACING)
+              << "parent" << std::setw(LS_SPACING)
+              << "start"  << std::setw(LS_SPACING)
+              << "name\n";
+
     for (uint32_t i = 0; i < dir->header.entryCount; i++)
         printDirEntry(&dir->entries[i]);
 }
 
 void FAT32::printDirEntry(DirEntry_t *entry) {
     assert(entry != nullptr && "entry is null");
-    std::cout << (entry->directory ? "[+]" : "[-]");
-    std::cout << ' ' << entry->size;
-    std::cout << ' ' << entry->parentStartCluster;
-    std::cout << ' ' << entry->startCluster;
-    std::cout << ' ' << entry->size;
-    std::cout << ' ' << entry->name << '\n';
+    std::cout << (entry->directory ? "[+]" : "[-]") << std::setw(LS_SPACING)
+              << entry->size << std::setw(LS_SPACING)
+              << entry->parentStartCluster << std::setw(LS_SPACING)
+              << entry->startCluster << std::setw(LS_SPACING)
+              <<  entry->name << '\n';
 }
 
 void FAT32::printFAT() {
@@ -427,9 +435,24 @@ void FAT32::removeEntryFromDir(Dir_t*dir, DirEntry_t *entry) {
 }
 
 void FAT32::mkdir(std::string name) {
-    std::unique_ptr<Dir_t> workingDir(loadDir(workingDirStartCluster));
-    std::unique_ptr<Dir_t> dir(createEmptyDir(name, workingDir->header.startCluster));
-    DirEntry_t entry = createEntry(dir.get());
+    DirEntry_t entry = getEntry(name);
+    assert(entry == NULL_DIR_ENTRY && "name is already taken");
+    uint32_t dirStartCluster;
+
+    size_t pos = name.find_last_of('/');
+    if (pos == std::string::npos) {
+        dirStartCluster = workingDirStartCluster;
+    } else {
+        std::string parDir = name.substr(0, pos);
+        entry = getEntry(parDir);
+        assert(entry != NULL_DIR_ENTRY && "target parent dir is NULL");
+        assert(entry.directory == true && "cannot insert into a file");
+        dirStartCluster = entry.startCluster;
+    }
+
+    std::unique_ptr<Dir_t> workingDir(loadDir(dirStartCluster));
+    std::unique_ptr<Dir_t> dir(createEmptyDir(name.substr(pos + 1, name.length() - 1 - pos), workingDir->header.startCluster));
+    entry = createEntry(dir.get());
     addEntryIntoDir(workingDir.get(), &entry);
     saveDir(dir.get());
 }
@@ -484,6 +507,8 @@ void FAT32::rmdir(std::string path) {
     assert(dir->header.entryCount == 0 && "dir is not empty");
     std::unique_ptr<Dir_t> parentDir(loadDir(entry.parentStartCluster));
     removeEntryFromDir(parentDir.get(), &entry);
+    freeAllOccupiedClusters(entry.startCluster);
+    fat[entry.startCluster] = FREE_CLUSTER;
 }
 
 inline uint32_t FAT32::getFileSize(FILE *file) const {
@@ -642,11 +667,17 @@ void FAT32::rm(std::string path) {
 
 void FAT32::cp(std::string des, std::string src) {
     // TODO
-    (void)des;
-    (void)src;
+    if (des == src)
+        return;
+
+    DirEntry_t file = getEntry(src);
+    assert(file != NULL_DIR_ENTRY && "file not found");
+    assert(file.directory == false && "cannot move a directory");
+
+    DirEntry_t destination = getEntry(des);
 }
 
-void FAT32::mv(std::string des, std::string src) {
+void FAT32::mv(std::string des, std::string src) { 
     /* 
        POSSIBLE OPTIONS:
        (1) /data       <- mv into a folder (under the same name) 
@@ -654,102 +685,67 @@ void FAT32::mv(std::string des, std::string src) {
        (2) /data/file  <- mv into a folder (under a new name) 
        (3) /data/file1 <- mv into a folder (overwrite an existing file) 
     */
-
-    // get the source file
-    std::string fileName;
+    
     DirEntry_t file = getEntry(src);
     assert(file != NULL_DIR_ENTRY && "file not found");
     assert(file.directory == false && "cannot move a directory");
 
-    Dir_t *dir;
-    DirEntry_t destination = getEntry(des);
-
-    // remove the file from its original parent dir
-    dir = loadDir(file.parentStartCluster);
+    // delete the file entirely from its original location
+    Dir_t *dir = loadDir(file.parentStartCluster);
     removeEntryFromDir(dir, &file);
     delete dir;
 
-    // (2)
-    if (destination == NULL_DIR_ENTRY) {
+    // load the destination entry
+    DirEntry_t destEntry = getEntry(des);
+    std::string fileName;
+    std::string parentDirPath;
+    size_t lastSlashPos;
+
+    if (destEntry == NULL_DIR_ENTRY) {
+        // (2)
         fileName = getFileName(des);
-        std::string parentDirPath;
-
-        size_t pos = des.find_last_of('/');
-        if (pos == std::string::npos)
+        lastSlashPos = des.find_last_of('/');
+        if (lastSlashPos == std::string::npos) {
             parentDirPath = des;
-        else parentDirPath = des.substr(0,  + 1);
-
-        DirEntry_t entry = getEntry(parentDirPath);
-
-        strcpy(file.name, fileName.c_str());  
-        dir = loadDir(entry.startCluster);
+        } else {
+            parentDirPath = des.substr(0, lastSlashPos + 1);
+        }
+        DirEntry_t dirEntry = getEntry(parentDirPath);
+        assert(dirEntry.directory == true && "error when loading target dir");
+        
+        strcpy(file.name, fileName.c_str());
+        dir = loadDir(dirEntry.startCluster);
         addEntryIntoDir(dir, &file);
         delete dir;
-    } else if (destination.directory == true) {
+    } else if (destEntry.directory == true) {
         // (1)
         fileName = getFileName(src);
-        dir = loadDir(destination.startCluster);
-        DirEntry_t entry = getEntry(fileName, dir);
+        dir = loadDir(destEntry.startCluster);
+        DirEntry_t prevEntry = getEntry(fileName, dir);
 
         // if there's a file with the same name it will be overwritten
-        if (entry != NULL_DIR_ENTRY) {
-            removeEntryFromDir(dir, &entry);
-            freeAllOccupiedClusters(entry.startCluster);
+        if (prevEntry != NULL_DIR_ENTRY) {
+            removeEntryFromDir(dir, &prevEntry);
+            freeAllOccupiedClusters(prevEntry.startCluster);
 
             // also we must not forget to delete the very first cluster
-            fat[entry.startCluster] = FREE_CLUSTER;
+            fat[prevEntry.startCluster] = FREE_CLUSTER;
             saveFat();
 
             // reload the directory after the file has been deleted
             delete dir;
-            dir = loadDir(destination.startCluster);  
+            dir = loadDir(destEntry.startCluster);  
         }
         // move the file into the new dir
         addEntryIntoDir(dir, &file);
         delete dir;
     } else {
-        // (3)  
+        // (3)
         rm(des);
-        dir = loadDir(destination.parentStartCluster);
-        strcpy(file.name, destination.name);
+        dir = loadDir(destEntry.parentStartCluster);
+        strcpy(file.name, destEntry.name);
         addEntryIntoDir(dir, &file);
         delete dir;
-    }
-}
-
-void FAT32::tree(std::string path) {
-    DirEntry_t entry = getEntry(path);
-    assert(entry.directory == true && "path must be a directory");
-    std::unique_ptr<Dir_t> dir(loadDir(entry.startCluster));
-    printTree(dir.get(), 0);
-}
-
-void FAT32::printTree(Dir_t *dir, uint32_t depth) {
-    /* 
-        [+] /
-        \__ [-] x.txt
-            [+] doc
-            \__ [-] a.pdf
-            \__ [+] tmp 
-    */
-    if (depth == 0) {
-        for (int j = 0; j < depth * 4; j++)
-            std::cout << " ";
-        std::cout << "[+] " << dir->header.name << "\n";
-    }
-
-    for (uint32_t i = 0; i < dir->header.entryCount; i++) {
-        for (int j = 0; j < depth * 4; j++)
-            std::cout << " ";
-        std::cout << "\\__ ";
-
-        printDirEntry(&dir->entries[i]);
-
-        if (dir->entries[i].directory == true) {
-            Dir_t *nestedDir = loadDir(dir->entries[i].startCluster);
-            printTree(nestedDir, depth + 1);
-            delete nestedDir;
-        }
     }
 }
 

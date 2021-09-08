@@ -1,0 +1,18 @@
+mkdir doc
+mkdir tmp
+mkdir img
+cd doc
+in data/vid1.wbm
+in data/vid2.wbm
+in data/test.txt
+cd ../img
+in data/meme.png
+in data/poem.jpg
+in data/wtf.gif
+cd /
+cd tmp
+in data/random
+in data/zero
+mkdir ../tmp/output
+mv /doc/vid2.wbm /tmp/output/vid2_out.wbm 
+out ../tmp/output/vid2_out.wbm

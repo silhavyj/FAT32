@@ -1,0 +1,30 @@
+info
+mkdir doc
+mkdir img
+mkdir tmp
+cd doc
+in data/vid1.wbm
+in data/vid2.wbm
+in data/test.txt
+cd ../img
+in data/meme.png
+in data/poem.jpg
+in data/wtf.gif
+cd /
+cd tmp
+in data/random
+in data/zero
+info
+cd /
+rm tmp/random
+rm tmp/zero
+rmdir tmp
+rm img/meme.png
+rm img/poem.jpg
+rm img/wtf.gif
+rmdir img
+rm doc/vid1.wbm
+rm doc/vid2.wbm
+rm doc/test.txt
+rmdir doc
+info

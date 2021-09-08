@@ -14,7 +14,8 @@
 
 class FAT32 : public IFS {
 public:
-    static constexpr uint32_t MAX_NAME_LEN = 12;
+    static constexpr uint32_t MAX_NAME_LEN = 16;
+    static constexpr uint32_t LS_SPACING = MAX_NAME_LEN - 1;
     static constexpr const char *DISK_FILE_NAME  = "disk.dat";
 
     static constexpr uint32_t DISK_SIZE    = MB(50);
@@ -112,7 +113,6 @@ public:
     void rm(std::string path) override;
     void cp(std::string des, std::string src) override;
     void mv(std::string des, std::string src) override;
-    void tree(std::string path) override;
     std::string getPWD() override;
     void info() override;
 };

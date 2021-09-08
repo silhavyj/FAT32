@@ -1,0 +1,10 @@
+mkdir doc
+mkdir tmp
+mkdir /tmp/output
+cd doc
+in data/vid2.wbm
+ls
+mv /doc/vid2.wbm /tmp/output/vid2_out.wbm 
+ls /tmp/output
+pwd
+out ../tmp/output/vid2_out.wbm
