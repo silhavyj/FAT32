@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="80.421768mm"
+   height="93.379868mm"
+   viewBox="0 0 80.421771 93.379867"
+   version="1.1"
+   id="svg8"
+   inkscape:version="1.0.2 (e86c870879, 2021-01-15)"
+   sodipodi:docname="diagram.svg">
+  <defs
+     id="defs2">
+    <marker
+       style="overflow:visible"
+       id="Arrow1Lend"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="Arrow1Lend"
+       inkscape:isstock="true">
+      <path
+         transform="matrix(-0.8,0,0,-0.8,-10,0)"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1pt;stroke-opacity:1"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         id="path872" />
+    </marker>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.98994949"
+     inkscape:cx="169.57499"
+     inkscape:cy="172.9498"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     inkscape:document-rotation="0"
+     showgrid="false"
+     inkscape:window-width="1896"
+     inkscape:window-height="997"
+     inkscape:window-x="12"
+     inkscape:window-y="39"
+     inkscape:window-maximized="0"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-55.602834,-116.09109)">
+    <g
+       id="g1402"
+       transform="matrix(0.56961551,0,0,0.56961551,41.236739,70.058427)">
+      <path
+         style="fill:none;stroke:#000000;stroke-width:0.361;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:2.166, 2.166;stroke-dashoffset:0;stroke-opacity:1"
+         d="M 118.74555,231.34752 V 210.06603"
+         id="path867" />
+      <path
+         style="fill:#b3b3b3;stroke:#b3b3b3;stroke-width:0.465;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:2.79, 0.93;stroke-dashoffset:0;stroke-opacity:1"
+         d="M 69.894793,110.11125 H 166.40675"
+         id="path1272" />
+      <rect
+         style="fill:#ffffff;stroke:#ff6600;stroke-width:0.501;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;paint-order:markers fill stroke"
+         id="rect857"
+         width="54.221298"
+         height="15.718445"
+         x="91.040123"
+         y="81.064064"
+         rx="4.3070002"
+         ry="4.3065271" />
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.27165px;line-height:0.661458em;font-family:'Nimbus Mono PS';-inkscape-font-specification:'Nimbus Mono PS, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke:#ff6600;stroke-width:0.501;stroke-miterlimit:4;stroke-dasharray:none"
+         x="107.23969"
+         y="91.126595"
+         id="text861"><tspan
+           sodipodi:role="line"
+           id="tspan859"
+           x="107.23969"
+           y="91.126595"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.27165px;font-family:'Nimbus Mono PS';-inkscape-font-specification:'Nimbus Mono PS, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke:#ff6600;stroke-width:0.501;stroke-miterlimit:4;stroke-dasharray:none">Shell</tspan></text>
+      <rect
+         style="fill:#ffffff;stroke:#00aad4;stroke-width:0.501;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;paint-order:markers fill stroke"
+         id="rect833"
+         width="54.221298"
+         height="15.718445"
+         x="91.040131"
+         y="193.80756"
+         rx="4.3070002"
+         ry="4.3070002" />
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.27165px;line-height:0.661458em;font-family:'Nimbus Mono PS';-inkscape-font-specification:'Nimbus Mono PS, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke:#0088aa;stroke-width:0.501;stroke-miterlimit:4;stroke-dasharray:none"
+         x="94.24649"
+         y="203.87009"
+         id="text837"><tspan
+           sodipodi:role="line"
+           id="tspan835"
+           x="94.24649"
+           y="203.87009"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.27165px;font-family:'Nimbus Mono PS';-inkscape-font-specification:'Nimbus Mono PS, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke:#0088aa;stroke-width:0.501;stroke-miterlimit:4;stroke-dasharray:none">IDiskDriver</tspan></text>
+      <g
+         id="g1268"
+         style="stroke:#ff6600;stroke-width:0.501;stroke-miterlimit:4;stroke-dasharray:none"
+         transform="translate(17.835542,36.547935)">
+        <rect
+           style="fill:#ffffff;stroke:#ff6600;stroke-width:0.501;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;paint-order:markers fill stroke"
+           id="rect839"
+           width="54.221298"
+           height="15.718445"
+           x="73.204582"
+           y="192.2316"
+           rx="4.3070002"
+           ry="4.3070002" />
+        <text
+           xml:space="preserve"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.27165px;line-height:0.661458em;font-family:'Nimbus Mono PS';-inkscape-font-specification:'Nimbus Mono PS, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke:#ff6600;stroke-width:0.501;stroke-miterlimit:4;stroke-dasharray:none"
+           x="91.643799"
+           y="202.29414"
+           id="text843"><tspan
+             sodipodi:role="line"
+             id="tspan841"
+             x="91.643799"
+             y="202.29414"
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.27165px;font-family:'Nimbus Mono PS';-inkscape-font-specification:'Nimbus Mono PS, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke:#ff6600;stroke-width:0.501;stroke-miterlimit:4;stroke-dasharray:none">Disk</tspan></text>
+      </g>
+      <path
+         sodipodi:type="star"
+         style="fill:#ffffff;stroke:#000000;stroke-width:0.361;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;paint-order:markers fill stroke"
+         id="path1187"
+         sodipodi:sides="3"
+         sodipodi:cx="64.264061"
+         sodipodi:cy="142.46085"
+         sodipodi:r1="2.6954372"
+         sodipodi:r2="1.3477187"
+         sodipodi:arg1="2.6179939"
+         sodipodi:arg2="3.6651914"
+         inkscape:flatsided="false"
+         inkscape:rounded="0"
+         inkscape:randomized="0"
+         inkscape:transform-center-y="-0.7911578"
+         transform="matrix(1,0,0,1.1740588,54.481493,45.893428)"
+         d="m 61.929744,143.80856 1.167158,-2.02157 1.167159,-2.02158 1.167159,2.02158 1.167158,2.02157 -2.334317,0 z" />
+      <rect
+         style="fill:#ffffff;stroke:#0088aa;stroke-width:0.501;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;paint-order:markers fill stroke"
+         id="rect851"
+         width="54.221298"
+         height="15.718445"
+         x="91.040131"
+         y="120.32674"
+         rx="4.3070002"
+         ry="4.3070002" />
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.27165px;line-height:0.661458em;font-family:'Nimbus Mono PS';-inkscape-font-specification:'Nimbus Mono PS, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke:#0088aa;stroke-width:0.501;stroke-miterlimit:4;stroke-dasharray:none"
+         x="111.52632"
+         y="130.38927"
+         id="text855"><tspan
+           sodipodi:role="line"
+           id="tspan853"
+           x="111.52632"
+           y="130.38927"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.27165px;font-family:'Nimbus Mono PS';-inkscape-font-specification:'Nimbus Mono PS, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke:#0088aa;stroke-width:0.501;stroke-miterlimit:4;stroke-dasharray:none">IFS</tspan></text>
+      <path
+         style="fill:none;stroke:#000000;stroke-width:0.361;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:2.166, 2.166;stroke-dashoffset:0;stroke-opacity:1"
+         d="M 117.97236,157.86669 V 136.5852"
+         id="path1194" />
+      <path
+         sodipodi:type="star"
+         style="fill:#ffffff;stroke:#000000;stroke-width:0.361;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;paint-order:markers fill stroke"
+         id="path1196"
+         sodipodi:sides="3"
+         sodipodi:cx="64.264061"
+         sodipodi:cy="142.46085"
+         sodipodi:r1="2.6954372"
+         sodipodi:r2="1.3477187"
+         sodipodi:arg1="2.6179939"
+         sodipodi:arg2="3.6651914"
+         inkscape:flatsided="false"
+         inkscape:rounded="0"
+         inkscape:randomized="0"
+         inkscape:transform-center-y="-0.7911578"
+         transform="matrix(1,0,0,1.1740588,53.708296,-27.587396)"
+         d="m 61.929744,143.80856 1.167158,-2.02157 1.167159,-2.02158 1.167159,2.02158 1.167158,2.02157 -2.334317,0 z" />
+      <rect
+         style="fill:#ffffff;stroke:#ff6600;stroke-width:0.501;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;paint-order:markers fill stroke"
+         id="rect845"
+         width="54.221298"
+         height="15.718445"
+         x="91.040123"
+         y="157.02174"
+         rx="4.3070002"
+         ry="4.3070002" />
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.27165px;line-height:0.661458em;font-family:'Nimbus Mono PS';-inkscape-font-specification:'Nimbus Mono PS, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke:#ff6600;stroke-width:0.501;stroke-miterlimit:4;stroke-dasharray:none"
+         x="107.52692"
+         y="167.08429"
+         id="text849"><tspan
+           sodipodi:role="line"
+           id="tspan847"
+           x="107.52692"
+           y="167.08429"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.27165px;font-family:'Nimbus Mono PS';-inkscape-font-specification:'Nimbus Mono PS, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke:#ff6600;stroke-width:0.501;stroke-miterlimit:4;stroke-dasharray:none">FAT32</tspan></text>
+      <path
+         style="fill:none;stroke:#000000;stroke-width:0.358391;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:2.15034, 2.15034;stroke-dashoffset:0;stroke-opacity:1"
+         d="M 118.74555,193.89128 V 172.91632"
+         id="path1227" />
+      <rect
+         style="fill:#ffffff;stroke:#000000;stroke-width:0.376878;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;paint-order:markers fill stroke"
+         id="rect1231"
+         width="4.1560473"
+         height="4.1560473"
+         x="210.80185"
+         y="-3.1632307"
+         transform="matrix(0.55504502,0.83182031,-0.55504502,0.83182031,0,0)" />
+      <path
+         style="fill:none;stroke:#000000;stroke-width:0.361;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:2.166, 2.166;stroke-dashoffset:0;stroke-opacity:1"
+         d="M 118.74555,120.22879 V 103.40615"
+         id="path1238" />
+      <rect
+         style="fill:#ffffff;stroke:#000000;stroke-width:0.376878;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;paint-order:markers fill stroke"
+         id="rect1240"
+         width="4.1560473"
+         height="4.1560473"
+         x="165.42172"
+         y="-48.543354"
+         transform="matrix(0.55504502,0.83182031,-0.55504502,0.83182031,0,0)" />
+      <path
+         style="fill:#b3b3b3;stroke:#b3b3b3;stroke-width:0.465;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:2.79, 0.93;stroke-dashoffset:0;stroke-opacity:1"
+         d="M 69.894793,185.86441 H 166.40675"
+         id="path1274" />
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.2922px;line-height:1.06em;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;fill:#b3b3b3;stroke-width:0.157305"
+         x="59.472935"
+         y="145.11157"
+         id="text1282"><tspan
+           sodipodi:role="line"
+           id="tspan1280"
+           x="59.472935"
+           y="145.11157"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.2922px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;fill:#b3b3b3;stroke-width:0.157305">Filesystem</tspan><tspan
+           sodipodi:role="line"
+           x="59.472935"
+           y="151.78131"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.2922px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;fill:#b3b3b3;stroke-width:0.157305"
+           id="tspan1288">implementation</tspan><tspan
+           sodipodi:role="line"
+           x="59.472935"
+           y="158.45103"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.2922px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;fill:#b3b3b3;stroke-width:0.157305"
+           id="tspan1302">(FAT 32)</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.2922px;line-height:1.06em;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;fill:#b3b3b3;stroke-width:0.157305"
+         x="59.523624"
+         y="214.74622"
+         id="text1294"><tspan
+           sodipodi:role="line"
+           x="59.523624"
+           y="214.74622"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.2922px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;fill:#b3b3b3;stroke-width:0.157305"
+           id="tspan1292">HDD manipulation,</tspan><tspan
+           sodipodi:role="line"
+           x="59.523624"
+           y="221.41595"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.2922px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;fill:#b3b3b3;stroke-width:0.157305"
+           id="tspan1298">network transmission,</tspan><tspan
+           sodipodi:role="line"
+           x="59.523624"
+           y="228.08568"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.2922px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;fill:#b3b3b3;stroke-width:0.157305"
+           id="tspan1300">file storage, ...</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.2922px;line-height:1.06em;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;fill:#b3b3b3;stroke-width:0.157305"
+         x="59.39613"
+         y="86.91378"
+         id="text1310"><tspan
+           sodipodi:role="line"
+           x="59.39613"
+           y="86.91378"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.2922px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;fill:#b3b3b3;stroke-width:0.157305"
+           id="tspan1308">User interface</tspan><tspan
+           sodipodi:role="line"
+           x="59.39613"
+           y="93.583511"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.2922px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;fill:#b3b3b3;stroke-width:0.157305"
+           id="tspan1317">(terminal)</tspan></text>
+    </g>
+  </g>
+</svg>
