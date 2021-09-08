@@ -66,4 +66,16 @@ type           size         parent          start          name
 ### Storage
 So far, the only implementation of `IDiskDriver` is done using a `binary file` ("disk image") stored on the user's local machine. However, the generality of the interface offers different ways as well. For example, we could send data across a network which would turn the project into a client/server application.
 
+## Configuration
+
+The parameters of the file system can be found in `src/fat32.h`. Some of the paramater that could be changed are:
+
+``` c++
+static constexpr uint32_t DISK_SIZE    = MB(50); 
+static constexpr uint32_t CLUSTER_SIZE = 128; // 128B
+static constexpr uint32_t MAX_NAME_LEN = 16;  // 16B
+```
+The changes will take place once the project is recompiled using the `make` tool.
+
 ### Testing
+I've tested the program manually using predefined "scripts" that could be found in `tests/scripts` and observing the output (a more automated way of testing is planned to be implemented in the future development). These files are loaded and executed using `load scripts/01`, etc. However, even though the basic functionality has been tested, **it is not guaranteed that there are no bugs within this project**.
