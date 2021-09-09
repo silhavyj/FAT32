@@ -1,6 +1,6 @@
 # FAT32 implementation
 
-This project is meant to demonstrate a simple implementation of a FAT file system. It could possibly be used as a reference or an inspiration when creating another project off of this one.
+This project is meant to demonstrate a simple implementation of a FAT file system. It could possibly be used as a reference or an inspiration when creating another project off of this one. Some basic information on what a FAT file system is can be found, for example, at https://en.wikipedia.org/wiki/File_Allocation_Table.
 
 ## Compilation
 
@@ -31,7 +31,7 @@ The compilation process is done through the `make`command that's supposed to be 
 | `info`   | prints out info about the file system (free space, cluster size, ...) | `info` |
 | `load`   | loads a text file containing commands and executes them | `load cmds.txt` |
 
-### Examples
+### Example
 ```
 /tmp> ls
 type           size         parent          start          name
@@ -64,7 +64,7 @@ type           size         parent          start          name
 ```
 
 ### Storage
-So far, the only implementation of `IDiskDriver` is done using a `binary file` ("disk image") stored on the user's local machine. However, the generality of the interface offers different ways as well. For example, we could send data across a network which would turn the project into a client/server application.
+So far, the only implementation of `IDiskDriver` is done using a `binary file` ("disk image") stored on the user's local machine. However, the generality of the interface offers different ways of implementation as well. For example, we could send data across a network which would turn the project into a client/server application.
 
 ## Configuration
 
@@ -74,8 +74,12 @@ The parameters of the file system can be found in `src/fat32.h`. Some of the par
 static constexpr uint32_t DISK_SIZE    = MB(50); 
 static constexpr uint32_t CLUSTER_SIZE = 128; // 128B
 static constexpr uint32_t MAX_NAME_LEN = 16;  // 16B
+static constexpr const char *DISK_FILE_NAME  = "disk.dat";
 ```
+
 The changes will take place once the project is recompiled using the `make` tool.
 
 ### Testing
 I've tested the program manually using predefined "scripts" that could be found in `tests/scripts` and observing the output (a more automated way of testing is planned to be implemented in the future development). These files are loaded and executed using `load scripts/01`, etc. However, even though the basic functionality has been tested, **it is not guaranteed that there are no bugs within this project**.
+
+A typical test scenario consists of something like: import a file somewhere within the virtual file system; copy it or move it somewhere else; export it out of the file system onto the local machine; compare the original file and exported one using `cmp`.

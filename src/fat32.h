@@ -93,6 +93,7 @@ private:
     DirEntry_t createEntry(Dir_t *dir);
     inline uint32_t getFileSize(FILE *file) const;
     std::string getFileName(std::string path) const;
+    void copyClusters(uint32_t srcStartCluster, uint32_t desStartCluster);
 
     void printDir(Dir_t *dir);
     void printDirEntry(DirEntry_t *entry);

@@ -666,15 +666,95 @@ void FAT32::rm(std::string path) {
 }
 
 void FAT32::cp(std::string des, std::string src) {
-    // TODO
+    // nothing to do
     if (des == src)
         return;
 
+    // make sure we're copying a file
     DirEntry_t file = getEntry(src);
     assert(file != NULL_DIR_ENTRY && "file not found");
     assert(file.directory == false && "cannot move a directory");
 
-    DirEntry_t destination = getEntry(des);
+    // make sure the a copy of the file would fit into the file system
+    // +1 is because of the entry itself, the rest is taken up by the content
+    uint32_t clustersNeeded = ceil(static_cast<double>(file.size) / CLUSTER_SIZE);
+    assert(existsNumberOfFreeClusters(1 + clustersNeeded) && "not enough free clusters");
+    
+    DirEntry_t destEntry = getEntry(des);
+    std::string fileName;
+    size_t lastSlashPos;
+    Dir_t *dir;
+
+    if (destEntry == NULL_DIR_ENTRY) {
+        fileName = getFileName(des);
+        lastSlashPos = des.find_last_of('/');
+        DirEntry_t dirEntry;
+        if (lastSlashPos == std::string::npos) {
+            dirEntry = getEntry(getPWD());
+        } else {
+            dirEntry = getEntry(des.substr(0, lastSlashPos + 1));
+        }
+        assert(dirEntry.directory == true && "error when loading target dir");
+        dir = loadDir(dirEntry.startCluster);
+        DirEntry_t newFileEntry = createFileEntry(dir, fileName.c_str(), file.size);
+        addEntryIntoDir(dir, &newFileEntry);
+        copyClusters(file.startCluster, newFileEntry.startCluster);
+        delete dir;
+    } else if (destEntry.directory == true) {
+        fileName = getFileName(src);
+        dir = loadDir(destEntry.startCluster);
+        DirEntry_t prevEntry = getEntry(fileName, dir);
+
+        // if there's a file with the same name it will be overwritten
+        if (prevEntry != NULL_DIR_ENTRY) {
+            removeEntryFromDir(dir, &prevEntry);
+            freeAllOccupiedClusters(prevEntry.startCluster);
+
+            // also we must not forget to delete the very first cluster
+            fat[prevEntry.startCluster] = FREE_CLUSTER;
+            saveFat();
+
+            // reload the directory after the file has been deleted
+            delete dir;
+            dir = loadDir(destEntry.startCluster);  
+        }
+        DirEntry_t newFileEntry = createFileEntry(dir, fileName.c_str(), file.size);
+        addEntryIntoDir(dir, &newFileEntry);
+        copyClusters(file.startCluster, newFileEntry.startCluster);
+        delete dir;
+    } else {
+        rm(des);
+        dir = loadDir(destEntry.parentStartCluster);
+        DirEntry_t newFileEntry = createFileEntry(dir, destEntry.name, file.size);
+        addEntryIntoDir(dir, &newFileEntry);
+        copyClusters(file.startCluster, newFileEntry.startCluster);
+        delete dir;
+    }
+}
+
+void FAT32::copyClusters(uint32_t srcStartCluster, uint32_t desStartCluster) {
+    uint32_t currSrcCluster = srcStartCluster;
+    uint32_t currDesCluster = desStartCluster;
+    uint32_t prevDesCluster;
+
+    std::unique_ptr<char> buffer(new char[CLUSTER_SIZE]);
+
+    while (fat[currSrcCluster] != EOF_CLUSTER) {
+        disk->setAddr(clusterAddr(currSrcCluster));
+        disk->read(reinterpret_cast<char *>(buffer.get()), CLUSTER_SIZE);
+        disk->setAddr(clusterAddr(currDesCluster));
+        disk->write(reinterpret_cast<const char *>(buffer.get()), CLUSTER_SIZE);
+        
+        // link up the clusters in the FAT table
+        prevDesCluster = currDesCluster;
+        currDesCluster = getFreeCluster();
+        fat[prevDesCluster] = currDesCluster;
+
+        // move on to the next cluster
+        currSrcCluster = fat[currSrcCluster];
+    }
+    // attaching the EOF cluster
+    fat[currDesCluster] = EOF_CLUSTER;
 }
 
 void FAT32::mv(std::string des, std::string src) { 
