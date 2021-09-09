@@ -83,3 +83,41 @@ The changes will take place once the project is recompiled using the `make` tool
 I've tested the program manually using predefined "scripts" that could be found in `tests/scripts` and observing the output (a more automated way of testing is planned to be implemented in the future development). These files are loaded and executed using `load scripts/01`, etc. However, even though the basic functionality has been tested, **it is not guaranteed that there are no bugs within this project**.
 
 A typical test scenario consists of something like: import a file somewhere within the virtual file system; copy it or move it somewhere else; export it out of the file system onto the local machine; compare the original file and exported one using `cmp`.
+
+#### Test script example (`tests/scripts/04`)
+``` bash
+in data/meme.png
+mkdir /memes
+mv /meme.png /memes/meme.png
+mkdir /files
+cd /files
+in data/zero
+in data/random
+mkdir /videa
+cd ../videa
+in data/vid1.wbm
+in data/vid2.wbm
+mkdir /cp
+cd /cp
+in data/poem.jpg
+in data/test.txt
+in data/wtf.gif
+mv /cp/wtf.gif /wtf.gif
+mkdir /cp/wtf.gif
+mv /wtf.gif /cp/wtf.gif/wtf.gif
+mkdir /CP
+cp /cp/poem.jpg /CP/poem.jpg
+cp /cp/test.txt /CP/test.txt
+rm /cp/poem.jpg
+rm /cp/test.txt
+cp /cp/wtf.gif/wtf.gif /CP/WTF.gif
+rm /cp/wtf.gif/wtf.gif
+out /memes/meme.png
+out /files/zero
+out /files/random
+out /videa/vid1.wbm
+out /videa/vid2.wbm
+out /CP/poem.jpg
+out /CP/test.txt
+out /CP/WTF.gif
+```

@@ -1,0 +1,34 @@
+in data/meme.png
+mkdir /memes
+mv /meme.png /memes/meme.png
+mkdir /files
+cd /files
+in data/zero
+in data/random
+mkdir /videa
+cd ../videa
+in data/vid1.wbm
+in data/vid2.wbm
+mkdir /cp
+cd /cp
+in data/poem.jpg
+in data/test.txt
+in data/wtf.gif
+mv /cp/wtf.gif /wtf.gif
+mkdir /cp/wtf.gif
+mv /wtf.gif /cp/wtf.gif/wtf.gif
+mkdir /CP
+cp /cp/poem.jpg /CP/poem.jpg
+cp /cp/test.txt /CP/test.txt
+rm /cp/poem.jpg
+rm /cp/test.txt
+cp /cp/wtf.gif/wtf.gif /CP/WTF.gif
+rm /cp/wtf.gif/wtf.gif
+out /memes/meme.png
+out /files/zero
+out /files/random
+out /videa/vid1.wbm
+out /videa/vid2.wbm
+out /CP/poem.jpg
+out /CP/test.txt
+out /CP/WTF.gif
